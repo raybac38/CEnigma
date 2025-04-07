@@ -2,11 +2,7 @@
 
 #include <stdlib.h>
 
-char * rotorA = "EKMFLGDQVZNTOWYHXUSPAIBRCJ";
-char * rotorB = "AJDKSIRUXBLHWTMCQGZNPYFVOE";
-char * rotorC = "BDFHJLCPRTXVZNYEIWGAKMUSQO";
-char * rotorD = "ESOVPZJAYQUIRHXLNFTGKDCMWB";
-char * rotorE = "VZBRGITYUPSDNHLXAWMJQOFECK";
+
 
 char * premierOffset;
 char * secondOffset;
@@ -16,36 +12,19 @@ int premierPosition;
 int secondPosition;
 int troisiemePosition;
 
-void createOffsetTable(char ** offsetsPtr, char ** rotorData)
+void createOffsetTable(char ** offsetTable, char ** rotorData) 
 {
-    *offsetsPtr = malloc(sizeof(char) * 26);
+    *offsetTable = malloc(sizeof(char) * 26);
     for(int i = 0; i < 26; i++)
     {
         char offset =  ((*rotorData)[i] - 'A' - i + 26) % 26;
-        (*offsetsPtr)[i] = offset;
+        (*offsetTable)[i] = offset;
     }
 }
 
-char * getRotorData(Rotor rotor)
-{
-    switch (rotor)
-    {
-    case A:
-        return rotorA;
-    case B:
-        return rotorB;
-    case C:
-        return rotorC;
-    case D:
-        return rotorD;
-    case E:
-        return rotorE;
-    default:
-        break;
-    }
-}
 
-int setRotorConfig(Rotor premier, int positionPremier, Rotor second, int positionSecond, Rotor troisieme, int positionTroisieme)
+
+int setRotorConfig(RotorIdentifier premier, int positionPremier, RotorIdentifier second, int positionSecond, RotorIdentifier troisieme, int positionTroisieme)
 {
     if(premier == second || second == troisieme || troisieme == premier)
     {
@@ -66,6 +45,8 @@ int setPlugboardPair(char a, char b)
 
 char code(char c)
 {
+    c = c - 'A';
+
     c = (c + troisiemeOffset[(c + troisiemePosition) % 26]) % 26;
     c = (c + secondOffset[(c + secondPosition) % 26]) % 26;
     c = (c + premierOffset[(c + premierPosition) % 26]) % 26;
@@ -82,5 +63,5 @@ char code(char c)
     secondPosition++;
     troisiemePosition++;
 
-    return c;
+    return c + 'A';
 }

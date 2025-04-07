@@ -63,6 +63,11 @@ int main(){
 
   t_reflector * l_reflector[3] = {refa,refb,refc};
 
+  while(0 == 0)
+  {
+
+  }
+  /*
   // SETTINGS SETUP
   t_settings * settings = init_settings(whell_order, reflector_choice, rings_settings, starting_position, plug_connections, l_rotor, l_reflector);
 
@@ -98,6 +103,7 @@ int main(){
   }
   printf("Message traduit :\n%s\n",result);
   return 0;
+  */
 }
 
 // INITIALISATION ROTOR, REFLECTOR, PLUG CONNECTIONS ET SETTINGS
@@ -140,7 +146,7 @@ int * init_offset(int rs[3], int sp[3]){
   }
   return offset;
 }
-
+/*
 t_settings * init_settings(int wo[3], int rc, int rs[3], int sp[3], char * pc, t_rotor * l_ro[5], t_reflector * l_re[3]){
   t_settings * settings = malloc(sizeof(*settings));
   assert(settings != NULL);
@@ -152,7 +158,7 @@ t_settings * init_settings(int wo[3], int rc, int rs[3], int sp[3], char * pc, t
   settings->offset = init_offset(rs, sp); // SET OFFSET
   return settings;
 }
-
+*/
 // MAPPING
 
 int recherche(int n, int * swap){
@@ -191,3 +197,4 @@ int perm2_rot(int n,t_rotor * rotor, int position){
 int perm_ref(int n,t_reflector reflector){
   return reflector[n-'A'];
 }
+  

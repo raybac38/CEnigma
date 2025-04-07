@@ -1,7 +1,10 @@
+#ifndef CENIGMA_H
+#define CENIGMA_H
+
 typedef enum 
 {
     A, B, C, D, E
-}Rotor; 
+}RotorIdentifier; 
 
 /*
     Permet de set la machine Enigma
@@ -13,7 +16,7 @@ typedef enum
     @param positionTroiseme position du rotor droit (0-25)
     @return 0 if succes, -1 if error  
 */
-int setRotorConfig(Rotor premier, int positionPremier, Rotor second, int positionSecond, Rotor troiseme, int positionTroiseme);
+int setRotorConfig(RotorIdentifier premier, int positionPremier, RotorIdentifier second, int positionSecond, RotorIdentifier troiseme, int positionTroiseme);
 
 /*
     Permet de set un couple a échanger sur la plugboard
@@ -30,5 +33,6 @@ int setPlugboardPair(char a, char b);
 */
 char code(char c);
 
+#endif
 
 
