@@ -9,8 +9,6 @@ typedef struct {
   int alph[26];
 } t_rotor;
 
-typedef int t_reflector[26];
-
 typedef struct {
   int swap1[10];
   int swap2[10];
@@ -18,25 +16,26 @@ typedef struct {
 
 typedef struct {
   t_rotor * r_order[3];
-  t_reflector reflector;
+  int * reflector;
   t_plug * plugboard;
   int * offset;
 } t_settings;
 
 
 t_rotor * init_rotor(int n, char * t);
-t_reflector * init_reflector(char * t);
+int * init_reflector(char * t);
 t_plug * init_plug_connection(char * t);
 int * init_offset(int rs[3], int sp[3]);
-t_settings * init_settings(int wo[3], int rc, int rs[3], int sp[3], char * pc, t_rotor * l_ro[5], t_reflector * l_re[3]);
+t_settings * init_settings(int wo[3], int rc, int rs[3], int sp[3], char * pc, t_rotor * l_ro[5], int * l_re[3]);
 
 int recherche(int n, int * swap);
 int map(int n, t_plug * plug);
 
 int perm1_rot(int n,t_rotor * rotor, int position);
+int rot_rech(int n,t_rotor * rotor);
 int perm2_rot(int n,t_rotor * rotor, int position);
 
-int perm_ref(int n,t_reflector reflector);
+int perm_ref(int n,int * reflector);
 
 
 int main(){
@@ -57,17 +56,12 @@ int main(){
   t_rotor * l_rotor[5] = {r1,r2,r3,r4,r5};
 
   // REFLECTORS
-  t_reflector * refa = init_reflector("EJMZALYXVBWFCRQUONTSPIKHGD");
-  t_reflector * refb = init_reflector("YRUHQSLDPXNGOKMIEBFZCWVJAT");
-  t_reflector * refc = init_reflector("FVPJIAOYEDRZXWGCTKUQSBNMHL");
+  int * refa = init_reflector("EJMZALYXVBWFCRQUONTSPIKHGD");
+  int * refb = init_reflector("YRUHQSLDPXNGOKMIEBFZCWVJAT");
+  int * refc = init_reflector("FVPJIAOYEDRZXWGCTKUQSBNMHL");
 
-  t_reflector * l_reflector[3] = {refa,refb,refc};
+  int * l_reflector[3] = {refa,refb,refc};
 
-  while(0 == 0)
-  {
-
-  }
-  /*
   // SETTINGS SETUP
   t_settings * settings = init_settings(whell_order, reflector_choice, rings_settings, starting_position, plug_connections, l_rotor, l_reflector);
 
@@ -91,6 +85,7 @@ int main(){
     // TRANSLATION
     int c = message[i];
     c = map(c,settings->plugboard);
+    c = c -'A';
     for(int j=0;j<3;j++){
       c = perm1_rot(c,settings->r_order[j], settings->offset[j]);
     }
@@ -98,12 +93,12 @@ int main(){
     for(int j=0;j<3;j++){
       c = perm2_rot(c,settings->r_order[2-j], settings->offset[2-j]);
     }
+    c = c +'A';
     c = map(c,settings->plugboard);
     result[i]=c;
   }
   printf("Message traduit :\n%s\n",result);
   return 0;
-  */
 }
 
 // INITIALISATION ROTOR, REFLECTOR, PLUG CONNECTIONS ET SETTINGS
@@ -113,16 +108,16 @@ t_rotor * init_rotor(int n, char * t){
   assert(rotor != NULL);
   rotor->notche = n - 'A';
   for(int i=0;i<26;i++){
-    (rotor->alph)[i]=t[i];
+    (rotor->alph)[i]=t[i]-'A';
   }
   return rotor;
 }
 
-t_reflector * init_reflector(char * t){
-  t_reflector * reflector = malloc(sizeof(*reflector));
+int * init_reflector(char * t){
+  int * reflector = malloc(26*sizeof(*reflector));
   assert(reflector != NULL);
   for(int i=0;i<26;i++){
-    (*reflector)[i]=t[i];
+    reflector[i]=t[i]-'A';
   }
   return reflector;
 }
@@ -146,8 +141,8 @@ int * init_offset(int rs[3], int sp[3]){
   }
   return offset;
 }
-/*
-t_settings * init_settings(int wo[3], int rc, int rs[3], int sp[3], char * pc, t_rotor * l_ro[5], t_reflector * l_re[3]){
+
+t_settings * init_settings(int wo[3], int rc, int rs[3], int sp[3], char * pc, t_rotor * l_ro[5], int * l_re[3]){
   t_settings * settings = malloc(sizeof(*settings));
   assert(settings != NULL);
   for (int i=0; i<3;i++){ // SET ROTOR ORDER
@@ -158,12 +153,12 @@ t_settings * init_settings(int wo[3], int rc, int rs[3], int sp[3], char * pc, t
   settings->offset = init_offset(rs, sp); // SET OFFSET
   return settings;
 }
-*/
+
 // MAPPING
 
 int recherche(int n, int * swap){
   for(int i=0; i<10;i++){
-    if (swap[i]=n){
+    if (swap[i]==n){
       return i;
     }
   }
@@ -175,26 +170,37 @@ int map(int n, t_plug * plug){
   if (j!=10){
     return plug->swap2[j];
   }
+  
   j = recherche(n,plug->swap2);
   if (j!=10){
     return plug->swap1[j];
   }
+  
   return n;
 }
 
 // ROTOR 1st path
 int perm1_rot(int n,t_rotor * rotor, int position){
-  return ((rotor->alph[(n+position-'A') % 26]-position -'A') % 26 + 26) % 26 + 'A';
+  return (rotor->alph[(n+position) % 26]-position+26) % 26;
 }
 
 // ROTOR 2nd path
+int rot_rech(int n,t_rotor * rotor){
+  for (int i=0;i<26;i++){
+    if (rotor->alph[i]==n){
+      return i;
+    }
+  }
+  printf("ERREUR RECHERCHE ROTOR\n");
+  assert(1);
+  return 0;
+}
+
 int perm2_rot(int n,t_rotor * rotor, int position){
-  return (rotor->alph[((n-position-'A') % 26 + 26) % 26]+position -'A') % 26 + 'A';
+  return (rot_rech((n+position)%26,rotor)-position+26)%26;
 }
 
 // REFLECTOR
-
-int perm_ref(int n,t_reflector reflector){
-  return reflector[n-'A'];
+int perm_ref(int n,int * reflector){
+  return reflector[n];
 }
-  
